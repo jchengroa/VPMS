@@ -2,11 +2,11 @@
 
 ### Final Project Proposal for LBYCPA2
 
-[cite_start]**Team:** Matt Sebastian Aquino, John Carlo Cheng Roa, Kurt Gabrielle Lim, Wayne Ian Tolentino [cite: 3]
+**Team:** Matt Sebastian Aquino, John Carlo Cheng Roa, Kurt Gabrielle Lim, Wayne Ian Tolentino
 
 ## 📝 Background
 
-[cite_start]The **Velasco Patient Management System** is a fast, low-cost, and resource-efficient Patient Management System specifically designed for facilities with limited IT infrastructure[cite: 5].
+The **Velasco Patient Management System** is a fast, low-cost, and resource-efficient Patient Management System specifically designed for facilities with limited IT infrastructure.
 
 ---
 
@@ -14,11 +14,11 @@
 
 The system provides the following core features:
 
-* [cite_start]**Dynamic Resource Allocation:** Ensures proper allocation of staff to rooms and equipment that is effective for both the staff and the patient[cite: 8].
-* [cite_start]**User Action Tracking and Undo:** Improves convenience by allowing users (staff and patient) to revert the most recent changes committed into the system[cite: 9].
-* [cite_start]**Staff Directory:** Includes an organized digital directory of hospital staff, sorted mainly by hierarchy, specialization, and availability[cite: 10].
-* [cite_start]**Record Retrieval:** Allows staff to instantly access patient records, such as medical histories and treatment updates, with a low search time[cite: 12].
-* [cite_start]**Patient Priority Queue:** Ensures critical patients are attended first via a priority queue system[cite: 13].
+* **Dynamic Resource Allocation:** Ensures proper allocation of staff to rooms and equipment that is effective for both the staff and the patient.
+* **User Action Tracking and Undo:** Improves convenience by allowing users (staff and patient) to revert the most recent changes committed into the system.
+* **Staff Directory:** Includes an organized digital directory of hospital staff, sorted mainly by hierarchy, specialization, and availability.
+* **Record Retrieval:** Allows staff to instantly access patient records, such as medical histories and treatment updates, with a low search time.
+* **Patient Priority Queue:** Ensures critical patients are attended first via a priority queue system.
 
 ---
 
