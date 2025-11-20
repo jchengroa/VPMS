@@ -1,4 +1,4 @@
-package ph.edu.dlsu.lbycpa2.vpms.controllers;
+package ph.edu.dlsu.lbycpa2.vpms.models;
 
 public class Staff {
     private String name;

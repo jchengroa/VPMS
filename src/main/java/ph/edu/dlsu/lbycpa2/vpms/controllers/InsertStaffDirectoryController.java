@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import ph.edu.dlsu.lbycpa2.vpms.models.Staff;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -171,7 +172,5 @@ public class InsertStaffDirectoryController {
             e.printStackTrace();
         }
     }
-
-
 
 }

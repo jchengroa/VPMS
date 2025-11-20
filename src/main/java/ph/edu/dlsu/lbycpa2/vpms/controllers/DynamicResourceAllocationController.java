@@ -5,27 +5,32 @@ import javafx.scene.control.*;
 
 public class DynamicResourceAllocationController {
 
-    @FXML private TextField txtStaff;
+    @FXML private ComboBox<String> cmbStaff;
     @FXML private TextField txtRoom;
     @FXML private Button btnAssign;
     @FXML private ListView<String> listAssignments;
 
+    private ResourceAllocator allocator;
+
     @FXML
     public void initialize() {
-        btnAssign.setOnAction(e -> assignResource());
+        allocator = new ResourceAllocator();
+        btnAssign.setOnAction(e -> handleAssign());
     }
 
-    private void assignResource() {
-        String staff = txtStaff.getText();
-        String room = txtRoom.getText();
+    private void handleAssign() {
+        String staff = cmbStaff.getValue();
+        String room = txtRoom.getText().trim();
 
         if (staff.isEmpty() || room.isEmpty()) {
-            listAssignments.getItems().add("Please fill both fields.");
+            listAssignments.getItems().add("❗ Please fill in both fields.");
             return;
         }
 
-        listAssignments.getItems().add(staff + " → Room " + room);
-        txtStaff.clear();
+        String result = allocator.assign(staff, room);
+        listAssignments.getItems().add(result);
+
+        cmbStaff.getSelectionModel().clearSelection();
         txtRoom.clear();
     }
 }

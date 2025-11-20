@@ -3,3 +3,4 @@ Matt Aquino - Nurse - None
 John - Intern - Cardiologist
 Joseph - Nurse - Radiologist
 Carlo - Senior - Pediatrician
+Dick Grayson - Senior - Cardiologist

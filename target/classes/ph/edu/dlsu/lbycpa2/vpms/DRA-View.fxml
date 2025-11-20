@@ -19,7 +19,8 @@
 
     <HBox spacing="10">
         <Label text="Staff Name:"/>
-        <TextField fx:id="txtStaff" promptText="Enter staff name"/>
+        <ComboBox fx:id="cmbStaff" prefWidth="120" promptText="Staff" />
+
     </HBox>
 
     <HBox spacing="10">
