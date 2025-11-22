@@ -25,7 +25,8 @@
 
     <HBox spacing="10">
         <Label text="Room Number:"/>
-        <TextField fx:id="txtRoom" promptText="Enter room number"/>
+        <ComboBox fx:id="cmbRoom" prefWidth="120" promptText="Room no." />
+
     </HBox>
 
     <Button text="Assign" fx:id="btnAssign"/>

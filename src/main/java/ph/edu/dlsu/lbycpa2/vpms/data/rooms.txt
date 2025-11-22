@@ -1,0 +1,10 @@
+Room 101 - ICU
+Room 102 - Surgeon
+Room 201 - Cardiologist
+Room 202 - Cardiologist
+Room 301 - Pediatrician
+Room 401 - Radiologist
+Room 402 - Radiologist
+Room 501 - General Practitioner
+Room 601 - NONE
+Room 602 - NONE
