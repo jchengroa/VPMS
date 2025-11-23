@@ -10,101 +10,215 @@ import java.util.*;
 
 public class ResourceAllocator {
 
-    private static final Path ROOM_FILE = Paths.get("src", "main", "java",
-            "ph", "edu", "dlsu", "lbycpa2", "vpms", "data", "rooms.txt");
-
-    private final Map<String, Staff> staffMap = new HashMap<>();  // key = name
-    private final Map<String, Room> roomMap = new HashMap<>();    // key = roomNumber
-    private final Map<String, String> assignments = new HashMap<>(); // room → staff
-
     private static final Path STAFF_FILE = Paths.get(
-            "src/main/java/ph/edu/dlsu/lbycpa2/vpms/data/staff.txt"
-    );
+            "src/main/java/ph/edu/dlsu/lbycpa2/vpms/data/staff.txt");
+
+    private static final Path ROOM_FILE = Paths.get(
+            "src/main/java/ph/edu/dlsu/lbycpa2/vpms/data/rooms.txt");
+
+    private static final Path ASSIGN_TRACKER_FILE = Paths.get(
+            "src/main/java/ph/edu/dlsu/lbycpa2/vpms/data/assignment tracker.txt");
+
+
+    private final Map<String, Staff> staffMap = new HashMap<>();
+    private final Map<String, Room> roomMap = new HashMap<>();
+
+    // LINKED LIST IMPLEMENTATION (history)
+    private AssignmentNode head = null;
+
+    private static class AssignmentNode {
+        String room;
+        String staff;
+        AssignmentNode next;
+
+        AssignmentNode(String room, String staff) {
+            this.room = room;
+            this.staff = staff;
+            this.next = null;
+        }
+    }
 
     public ResourceAllocator() {
         loadStaff();
         loadRooms();
+        loadAssignments();
     }
 
-    /** Load staff from staff.txt */
+    // LOAD STAFF FILE
     private void loadStaff() {
         try {
-            List<String> lines = Files.readAllLines(STAFF_FILE, StandardCharsets.UTF_8);
-            for (String line : lines) {
-                String[] parts = line.split("\\s-\\s");
-                if (parts.length == 3) {
-                    String name = parts[0].trim();
-                    String rank = parts[1].trim();
-                    String specialty = parts[2].trim();
-                    staffMap.put(name.toLowerCase(), new Staff(name, rank, specialty));
-                } else {
-                    System.out.println("Skipping invalid staff line: " + line);
+            if (Files.exists(STAFF_FILE)) {
+                for (String line : Files.readAllLines(STAFF_FILE, StandardCharsets.UTF_8)) {
+                    String[] parts = line.split("\\s-\\s");
+                    if (parts.length == 3) {
+                        staffMap.put(
+                                parts[0].trim().toLowerCase(),
+                                new Staff(parts[0].trim(), parts[1].trim(), parts[2].trim())
+                        );
+                    }
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load staff.txt", e);
+            System.out.println("Could not load staff.txt: " + e.getMessage());
         }
     }
 
-
-
-    /** For now, define sample rooms */
+    // LOAD ROOMS FILE
     private void loadRooms() {
         try {
-            List<String> lines = Files.readAllLines(ROOM_FILE, StandardCharsets.UTF_8);
-            for (String line : lines) {
-                String[] parts = line.split("\\s-\\s");
-                if (parts.length == 2) {
-                    // Remove "Room " prefix from room number
-                    String roomNumber = parts[0].trim().replace("Room ", "");
-                    String specialty = parts[1].trim();
-                    roomMap.put(roomNumber, new Room(roomNumber, specialty));
-                } else {
-                    System.out.println("Skipping invalid room line: " + line);
+            if (Files.exists(ROOM_FILE)) {
+                for (String line : Files.readAllLines(ROOM_FILE, StandardCharsets.UTF_8)) {
+                    String[] parts = line.split("\\s-\\s");
+                    if (parts.length == 2) {
+                        String roomNum = parts[0].trim().replace("Room ", "");
+                        roomMap.put(roomNum, new Room(roomNum, parts[1].trim()));
+                    }
                 }
             }
         } catch (IOException e) {
-            // fallback to hardcoded rooms if file not found
-            roomMap.put("101", new Room("101", "Surgeon"));
-            roomMap.put("102", new Room("102", "Cardiologist"));
-            roomMap.put("103", new Room("103", "NONE"));
-            roomMap.put("201", new Room("201", "Pediatrician"));
+            System.out.println("Could not load rooms.txt: " + e.getMessage());
         }
+    }
+
+    private void loadAssignments() {
+        if (!Files.exists(ASSIGN_TRACKER_FILE)) {
+            return;
+        }
+
+        try {
+            for (String line : Files.readAllLines(ASSIGN_TRACKER_FILE, StandardCharsets.UTF_8)) {
+                if (line.contains(" has been assigned to ")) {
+                    String[] parts = line.split(" has been assigned to ");
+                    if (parts.length == 2) {
+                        String staffName = parts[0].trim();
+                        String roomNumber = parts[1].trim();
+                        addAssignmentHistory(roomNumber, staffName);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Could not load assignment tracker.txt: " + e.getMessage());
+        }
+    }
+
+    // Helper: Append a history node (linked-list insertion at end)
+    private void addAssignmentHistory(String room, String staff) {
+        AssignmentNode newNode = new AssignmentNode(room, staff);
+        if (head == null) {
+            head = newNode;
+            return;
+        }
+        AssignmentNode current = head;
+        while (current.next != null) current = current.next;
+        current.next = newNode;
+    }
+
+    public void saveCurrentAssignments() {
+        Map<String, String> latestAssignments = buildLatestAssignmentMap();
+        List<String> lines = new ArrayList<>();
+        for (Map.Entry<String, String> entry : latestAssignments.entrySet()) {
+            lines.add(entry.getKey() + " to Room " + entry.getValue());
+        }
+
+    }
+
+
+    // Helper: return the latest room for a staff (scan entire list, last match wins)
+    public String findStaffRoom(String staffName) {
+        AssignmentNode current = head;
+        String latestRoom = null;
+        while (current != null) {
+            if (current.staff.equalsIgnoreCase(staffName)) {
+                latestRoom = current.room;
+            }
+            current = current.next;
+        }
+        return latestRoom; // null if not found
+    }
+
+    // Helper: return the latest staff occupying a room (last match wins)
+    public String findRoomOccupant(String roomNumber) {
+        AssignmentNode current = head;
+        String latestStaff = null;
+        while (current != null) {
+            if (current.room.equalsIgnoreCase(roomNumber)) {
+                latestStaff = current.staff;
+            }
+            current = current.next;
+        }
+        return latestStaff; // null if not found
+    }
+
+    // Helper: check whether room is currently occupied (based on latest scan)
+    public boolean isRoomCurrentlyAssigned(String roomNumber) {
+        return findRoomOccupant(roomNumber) != null;
+    }
+
+    // Helper: check whether staff currently assigned (based on latest scan)
+    public boolean isStaffCurrentlyAssigned(String staffName) {
+        return findStaffRoom(staffName) != null;
+    }
+
+    // Build a map of current assignments from history
+    public Map<String, String> buildLatestAssignmentMap() {
+        Map<String, String> latestByStaff = new LinkedHashMap<>(); // LinkedHashMap preserves insertion order
+        AssignmentNode current = head;
+        while (current != null) {
+            // overwrite previous entry for the staff; later entries are newer
+            latestByStaff.put(current.staff, current.room);
+            current = current.next;
+        }
+        return latestByStaff;
     }
 
     public String assign(String staffName, String roomNumber) {
-        // Validate staff
-        Staff s = staffMap.get(staffName.toLowerCase());
-        if (s == null) {
+        if (staffName == null || roomNumber == null) {
+            return "Invalid input.";
+        }
+
+        Staff staff = staffMap.get(staffName.toLowerCase());
+        if (staff == null) {
             return "Staff not found in directory.";
         }
 
-        // Validate room
-        Room r = roomMap.get(roomNumber);
-        if (r == null) {
+        Room room = roomMap.get(roomNumber);
+        if (room == null) {
             return "Room does not exist.";
         }
 
-        // Check if room already assigned
-        if (assignments.containsKey(roomNumber)) {
-            return "Room " + roomNumber + " is already assigned to "
-                    + assignments.get(roomNumber) + ".";
+        // 1) If staff already assigned to same room
+        String currentRoom = findStaffRoom(staffName);
+        if (currentRoom != null && currentRoom.equals(roomNumber)) {
+            return staffName + " is already assigned to Room " + roomNumber + ".";
         }
 
-        // Check specialty match
-        if (!r.getSpecialty().equalsIgnoreCase("NONE") &&
-                !r.getSpecialty().equalsIgnoreCase(s.getSpecialty())) {
+        // 2) Specialty check
+        if (!room.getSpecialty().equalsIgnoreCase("NONE") &&
+                !room.getSpecialty().equalsIgnoreCase("ICU") &&
+                !room.getSpecialty().equalsIgnoreCase(staff.getSpecialty())) {
 
-            return "Room requires a " + r.getSpecialty()
-                    + " but staff is a " + s.getSpecialty() + ".";
+            return "Room requires a " + room.getSpecialty() +
+                    " but staff is a " + staff.getSpecialty() + ".";
         }
 
-        // Assign
-        assignments.put(roomNumber, s.getName());
-        return "Assigned " + s.getName() + " to Room " + roomNumber;
+        // 3) Append to history
+        addAssignmentHistory(roomNumber, staff.getName());
+
+        // 4) Persist the latest assignment to file
+        saveCurrentAssignments();
+
+        return "Assigned " + staff.getName() + " to Room " + roomNumber;
     }
 
-    public Map<String, String> getAssignments() {
-        return assignments;
+
+    public List<String> getAssignments() {
+        List<String> result = new ArrayList<>();
+        AssignmentNode current = head;
+        while (current != null) {
+            result.add(current.staff + " has been assigned to " + current.room);
+            current = current.next;
+        }
+        return result;
     }
+
 }

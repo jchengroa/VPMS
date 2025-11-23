@@ -27,16 +27,14 @@ public class StaffDirectoryController {
     @FXML private ListView<String> listOutput;
 
 
-    // keep Staff objects sorted by name (case-insensitive)
+    // keep Staff objects sorted by name
     private final TreeSet<Staff> bst = new TreeSet<>((a, b) -> {
         int cmp = a.getName().compareToIgnoreCase(b.getName());
         if (cmp != 0) return cmp;
-        // fallback to full string to avoid equality conflict in TreeSet comparator
         return a.toString().compareToIgnoreCase(b.toString());
     });
 
-    // File path here to access staff data
-    private static final Path FILE_PATH = Paths.get("src", "main", "java", "ph", "edu", "dlsu", "lbycpa2", "vpms", "data", "staff.txt");
+    private static final Path STAFF_FILE = Paths.get("src/main/java/ph/edu/dlsu/lbycpa2/vpms/data/staff.txt");
 
 
     @FXML
@@ -56,24 +54,24 @@ public class StaffDirectoryController {
     private void loadStaffFromFile() {
         try {
             // ensure parent directories exist (helpful if file path folders are missing)
-            if (Files.notExists(FILE_PATH.getParent())) {
+            if (Files.notExists(STAFF_FILE.getParent())) {
                 try {
-                    Files.createDirectories(FILE_PATH.getParent());
+                    Files.createDirectories(STAFF_FILE.getParent());
                 } catch (IOException ex) {
                     listOutput.getItems().add("Could not create directories: " + ex.getMessage());
                     return;
                 }
             }
 
-            if (Files.notExists(FILE_PATH)) {
+            if (Files.notExists(STAFF_FILE)) {
                 // create empty file
-                Files.createFile(FILE_PATH);
-                listOutput.getItems().add("Created staff file at: " + FILE_PATH.toString());
+                Files.createFile(STAFF_FILE);
+                listOutput.getItems().add("Created staff file at: " + STAFF_FILE.toString());
                 return;
             }
 
             // Read file (each line in format: Name - Role - Rank)
-            Files.lines(FILE_PATH, StandardCharsets.UTF_8)
+            Files.lines(STAFF_FILE, StandardCharsets.UTF_8)
                     .map(String::trim)
                     .filter(line -> !line.isEmpty())
                     .forEach(line -> {
@@ -149,7 +147,6 @@ public class StaffDirectoryController {
                     // split into words (first name, last name, etc.)
                     String[] parts = name.split("\\s+");
 
-                    // Name match rules:
                     // 1. Full name contains input
                     boolean fullNameMatch = name.contains(input);
 
