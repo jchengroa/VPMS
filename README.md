@@ -1,5 +1,7 @@
 # 🏥 Velasco Patient Management System
 
+<img width="250" height="250" alt="VPMS" src="https://github.com/user-attachments/assets/3b9ae429-5935-418b-9a25-67514a8b31f4" />
+
 ### Final Project Proposal for LBYCPA2
 
 **Team:** Matt Sebastian Aquino, John Carlo Cheng Roa, Kurt Gabrielle Lim, Wayne Ian Tolentino
